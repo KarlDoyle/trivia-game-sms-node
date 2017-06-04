@@ -1,17 +1,8 @@
+const MessagingResponse = require('twilio').twiml.MessagingResponse;
 const Entities = require('html-entities').XmlEntities;
 const entities = new Entities();
 const fallback = require('./fallback.json')
 const url = 'https://opentdb.com/api.php?amount=10&type=boolean';
-
-// // public
-// const init = init;
-// // private
-// const getListOfQuestionsFromJson = getListOfQuestionsFromJson;
-// const getListOfQuestionsFromApi = getListOfQuestionsFromApi;
-// const getQuestion = getQuestion;
-// const sendMessage = sendMessage;
-// const getMessage = getMessage;
-// const createMessage = createMessage;
 
 module.exports = {
   init: init
@@ -75,9 +66,11 @@ function getListOfQuestionsFromApi() {
  * @return {Obj}     The response
  */
 function sendMessage(req, res) {
-  let message = getMessage(req, res)
+  const twiml = new MessagingResponse();
+  const message = getMessage(req, res)
+  twiml.message(message);
   res.writeHead(200, {'Content-Type': 'text/xml'});
-  res.end(message);
+  res.end(twiml.toString());
 }
 
 /**
