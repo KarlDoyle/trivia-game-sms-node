@@ -35,6 +35,15 @@ Start the app ( this script is in `package.json` )
 
 Now send a POST request to `http://localhost:1337/sms` to  get a dummy response;
 
+### Setting Up Twilio
+
+Ensure you have a [Twilio](https://www.twilio.com) account set up. you have access to a trial account where you can test for free.
+
+Here is a tutorial - [RECEIVE AND REPLY TO SMS AND MMS MESSAGES IN NODE.JS](https://www.twilio.com/docs/guides/how-to-receive-and-reply-in-node-js)
+
+
+
+
 
 ## License
 

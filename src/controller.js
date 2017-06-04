@@ -1,5 +1,5 @@
 const MessagingResponse = require('twilio').twiml.MessagingResponse;
-const Entities = require('html-entities').XmlEntities;
+const Entities = require('html-entities').AllHtmlEntities;
 const entities = new Entities();
 const fallback = require('./fallback.json')
 const url = 'https://opentdb.com/api.php?amount=10&type=boolean';
@@ -15,19 +15,18 @@ module.exports = {
  * @return {String}     Returns the user the correct string based on their progress in the game
  */
 function init(req, res) {
+  // check if the questions have been stored in the session
   if (req.session.questions) {
-      setTimeout(function() {sendMessage(req, res)}, 500)
+      sendMessage(req, res)
   } else {
     getListOfQuestionsFromApi().then((data) => {
-      console.log('success')
       let parsed = JSON.parse(data);
       req.session.questions = parsed.results;
-      setTimeout(function() {sendMessage(req, res)}, 500)
+      sendMessage(req, res)
     }).catch((err) => {
-      console.error('err')
       console.error(err)
       req.session.questions = getListOfQuestionsFromJson();
-      setTimeout(function() {sendMessage(req, res)}, 500)
+      sendMessage(req, res)
     });
   }
 }
@@ -91,8 +90,9 @@ function getMessage(req, res) {
     message = createMessage(2, req.session.counter, req)
     req.session.counter = 0;
   } else {
-
-    if ((Math.random() >= 0.5).toString() === (Math.random() >= 0.5).toString()) {
+    let correct_answer = req.session.questions[req.session.counter].correct_answer.toUpperCase();
+    let given_answer = req.body.Body.toUpperCase();
+    if (given_answer === correct_answer) {
       message = createMessage(3, req.session.counter, req)
       req.session.counter = req.session.counter + 1;
     } else {
@@ -113,12 +113,12 @@ function getQuestion(counter, req) {
 
 function createMessage(stage, counter, req) {
   if (stage === 1) {
-    return `You have begun....\nQuestion ${counter + 1}\ncounter is ${counter}\n${getQuestion(counter, req)}\n===============`
+    return `\nYou have begun....\nQuestion ${counter + 1}\ncounter is ${counter}\nTrue or False. ${getQuestion(counter, req)}\n===============`
   } else if (stage === 2) {
-    return `Game complete!\ncounter is ${counter}\nStart again\n===============`;
+    return `\nGame complete!\ncounter is ${counter}\nStart again\n===============`;
   } else if (stage === 3) {
-    return `Correct\nNext stage\nQuestion ${counter + 1}\ncounter is ${counter}\n${getQuestion(counter + 1, req)}\n===============`
+    return `\nCorrect\nNext stage\nQuestion ${counter + 1}\ncounter is ${counter}\nTrue or False. ${getQuestion(counter + 1, req)}\n===============`
   } else if (stage === 4) {
-    return `You Lose!\nyour score is ${counter - 1}. Try again\n===============`;
+    return `\nYou Lose!\nyour score is ${counter - 1}. \n Do you want to try again?\n===============`;
   }
 }
